@@ -15,7 +15,8 @@ the ability to share context across machines or with teammates.
 ## The solution
 
 Store AI context files in a private repository (created from this template), organized by source repo name.
-A bootstrap script symlinks each file back into its project directory so local AI tooling finds it as normal.
+`install.sh` symlinks each file back into its project directory so local AI tooling finds it as normal.
+`extract-ai-context.sh` automates moving a file out of a public repo and into this one.
 
 ## Using this template
 
@@ -38,25 +39,45 @@ cd ai-context
 
 ```text
 ai-context/
-├── install.sh          # Creates symlinks into local project directories
+├── extract-ai-context.sh  # Moves AI context files from a public repo into this one
+├── install.sh             # Creates symlinks into local project directories
 ├── README.md
 └── <repo-name>/
-    └── CLAUDE.md       # (or AGENTS.md or GEMINI.md)
+    └── CLAUDE.md          # (or AGENTS.md or GEMINI.md — multiple files supported)
 ```
 
-Each subdirectory is named after the source repository. The `install.sh` script scans them and creates a
-symlink at `<projects-root>/<repo-name>/<filename>` for each one found.
+Each subdirectory is named after the source repository.
 
-## install.sh options
+## extract-ai-context.sh
+
+Automates the full extraction workflow for a public repo: untracks the AI context file(s), adds them to
+`.gitignore`, stores them here, and symlinks them back so local AI tooling is unaffected.
+
+```bash
+./extract-ai-context.sh <path-to-repo>
+```
+
+What it does:
+
+1. Finds all of `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` present in the target repo
+1. Runs `git rm --cached` to untrack each file
+1. Appends each filename to `.gitignore` in the target repo
+1. Copies the files into `<repo-name>/` here and pushes
+1. Symlinks the original paths back to the copies here
+1. Pushes the updated target repo
+
+## install.sh
+
+Scans each subdirectory and creates symlinks in the matching local project directory.
 
 ```bash
 ./install.sh [--dry-run] [--projects-dir <path>]
 ```
 
-| Option                  | Default                                           | Description                        |
-|-------------------------|---------------------------------------------------|------------------------------------|
-| `--dry-run`             |                                                   | Preview symlinks without creating  |
-| `--projects-dir <path>` | `~/Documents/projects` (macOS) or `~/src` (Linux) | Override the projects root         |
+| Option                  | Default                                           | Description                       |
+|-------------------------|---------------------------------------------------|-----------------------------------|
+| `--dry-run`             |                                                   | Preview symlinks without creating |
+| `--projects-dir <path>` | `~/Documents/projects` (macOS) or `~/src` (Linux) | Override the projects root        |
 
 ## Setup on a new machine
 
@@ -66,12 +87,3 @@ gh repo clone <your-username>/ai-context
 cd ai-context
 ./install.sh
 ```
-
-## Adding repos to your instance
-
-Manually: copy the AI context file into a subdirectory named after the repo, commit, and push. Then run
-`./install.sh` to create the symlink.
-
-Or use a tool like
-[`extract-ai-context.sh`](https://github.com/ali5ter/carrybag-lite/blob/main/tools/extract-ai-context.sh)
-to automate the full workflow: untrack the file from the public repo, move it here, and symlink it back.

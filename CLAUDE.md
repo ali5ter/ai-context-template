@@ -56,7 +56,7 @@ unextracted copy of an AI context file.
 
 ### Platform detection for projects root
 
-`install.sh` defaults to `~/Documents/projects` on macOS and `~/src` on Linux, matching the convention used in
+`install.sh` defaults to `~/Documents/Projects` on macOS and `~/src` on Linux, matching the convention used in
 [carrybag-lite](https://github.com/ali5ter/carrybag-lite). Override with `--projects-dir`.
 
 ## Repository Structure
@@ -87,15 +87,29 @@ ai-context/  (personal private instance)
 
 ### extract-ai-context.sh
 
+Two modes, auto-detected from the argument:
+
+**Single mode** (argument is a git repo): original verbose behaviour unchanged.
+
 1. Resolves the target repo path to absolute
 2. Scans for all of `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` — collects regular files only, skips symlinks
 3. For each found file: `git rm --cached`, appends to `.gitignore`
 4. Makes one commit to the target repo covering all `.gitignore` changes
-5. Copies each file into `$SCRIPT_DIR/<repo-name>/`, stages all, makes one commit, pushes this repo
+5. Copies each file into `$SCRIPT_DIR/<repo-name>/`, makes one commit, pushes this repo
 6. Creates symlinks: `<target-repo>/<file>` → `$SCRIPT_DIR/<repo-name>/<file>`
 7. Pushes the target repo
 
-**Exit codes:** 0 success, 1 bad args/not-a-repo, 2 no AI context files found
+**Batch mode** (argument is a directory, or no argument — defaults to `~/Documents/Projects` on macOS):
+
+1. Scans every subdirectory for git repos with unextracted AI context files
+2. Phase 1 (optionally parallel with `--parallel`): untrack files from each target repo + copy here
+3. Phase 2 (sequential): one commit per extracted repo to this repo, then one push
+4. Phase 3 (sequential): create all symlinks
+5. Phase 4: push each target repo, display per-repo results and summary
+
+**Options:** `--parallel` (batch mode only), `-q/--quiet` (suppress skipped repos)
+
+**Exit codes:** 0 success, 1 bad args/not-a-repo (single mode), 2 no AI context files found (single mode)
 
 ### install.sh
 

@@ -50,21 +50,28 @@ Each subdirectory is named after the source repository.
 
 ## extract-ai-context.sh
 
-Automates the full extraction workflow for a public repo: untracks the AI context file(s), adds them to
-`.gitignore`, stores them here, and symlinks them back so local AI tooling is unaffected.
+Automates the full extraction workflow: untracks AI context file(s), adds them to `.gitignore`, stores
+them here, and symlinks them back so local AI tooling is unaffected.
 
 ```bash
-./extract-ai-context.sh <path-to-repo>
+./extract-ai-context.sh [--parallel] [-q] [<path>]
 ```
 
-What it does:
+`<path>` can be a git repository (single mode) or a directory of repositories (batch mode).
+Omit it to scan the default projects directory (`~/Documents/Projects` on macOS, `~/src` on Linux).
 
-1. Finds all of `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` present in the target repo
-1. Runs `git rm --cached` to untrack each file
-1. Appends each filename to `.gitignore` in the target repo
-1. Copies the files into `<repo-name>/` here and pushes
+| Option        | Description                                          |
+|---------------|------------------------------------------------------|
+| `--parallel`  | Process repos concurrently in batch mode             |
+| `-q, --quiet` | Suppress output for repos with no AI context files   |
+
+What it does (batch mode):
+
+1. Scans every subdirectory for git repos containing unextracted `CLAUDE.md`, `AGENTS.md`, or `GEMINI.md`
+1. Untracks each file and appends it to `.gitignore` in the target repo
+1. Copies files into `<repo-name>/` here; commits and pushes this repo
 1. Symlinks the original paths back to the copies here
-1. Pushes the updated target repo
+1. Pushes each updated target repo
 
 ## install.sh
 

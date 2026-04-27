@@ -40,7 +40,7 @@ PROJECTS_DIR=""
 # @example default_projects_dir
 default_projects_dir() {
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "$HOME/Documents/projects"
+        echo "$HOME/Documents/Projects"
     else
         echo "$HOME/src"
     fi
@@ -87,7 +87,7 @@ Usage: $(basename "$0") [--dry-run] [--projects-dir <path>]
 Options:
   --dry-run              Preview changes without making them
   --projects-dir <path>  Override the default projects root directory
-                         (default: ~/Documents/projects on macOS, ~/src on Linux)
+                         (default: ~/Documents/Projects on macOS, ~/src on Linux)
   -h, --help             Show this help and exit
 EOF
     exit 0

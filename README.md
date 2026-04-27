@@ -24,7 +24,7 @@ Store AI context files in a private repository (created from this template), org
 1. Clone it locally:
 
 ```bash
-cd ~/Documents/projects   # or ~/src on Linux
+cd ~/Documents/Projects   # or ~/src on Linux
 gh repo clone <your-username>/ai-context
 ```
 
@@ -77,12 +77,12 @@ Scans each subdirectory and creates symlinks in the matching local project direc
 | Option                  | Default                                           | Description                       |
 |-------------------------|---------------------------------------------------|-----------------------------------|
 | `--dry-run`             |                                                   | Preview symlinks without creating |
-| `--projects-dir <path>` | `~/Documents/projects` (macOS) or `~/src` (Linux) | Override the projects root        |
+| `--projects-dir <path>` | `~/Documents/Projects` (macOS) or `~/src` (Linux) | Override the projects root        |
 
 ## Setup on a new machine
 
 ```bash
-cd ~/Documents/projects   # or ~/src on Linux
+cd ~/Documents/Projects   # or ~/src on Linux
 gh repo clone <your-username>/ai-context
 cd ai-context
 ./install.sh

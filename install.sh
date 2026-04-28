@@ -31,6 +31,7 @@ type pfb >/dev/null 2>&1 || {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPOS_DIR="$SCRIPT_DIR/repos"
 DRY_RUN=false
 AI_FILES=(CLAUDE.md AGENTS.md GEMINI.md)
 PROJECTS_DIR=""
@@ -54,7 +55,7 @@ default_projects_dir() {
 # @example link_context_file my-repo CLAUDE.md /home/user/src/my-repo
 link_context_file() {
     local repo_name="$1" ai_file="$2" project_dir="$3"
-    local src="$SCRIPT_DIR/$repo_name/$ai_file"
+    local src="$REPOS_DIR/$repo_name/$ai_file"
     local dst="$project_dir/$ai_file"
 
     if [[ "$DRY_RUN" == true ]]; then
@@ -114,7 +115,7 @@ main() {
 
     local linked=0 skipped=0
 
-    for repo_dir in "$SCRIPT_DIR"/*/; do
+    for repo_dir in "$REPOS_DIR"/*/; do
         [[ -d "$repo_dir" ]] || continue
         local repo_name
         repo_name="$(basename "$repo_dir")"

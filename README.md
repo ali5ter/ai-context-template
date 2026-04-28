@@ -42,11 +42,12 @@ ai-context/
 ├── extract-ai-context.sh  # Moves AI context files from a public repo into this one
 ├── install.sh             # Creates symlinks into local project directories
 ├── README.md
-└── <repo-name>/
-    └── CLAUDE.md          # (or AGENTS.md or GEMINI.md — multiple files supported)
+└── repos/
+    └── <repo-name>/
+        └── CLAUDE.md      # (or AGENTS.md or GEMINI.md — multiple files supported)
 ```
 
-Each subdirectory is named after the source repository.
+Each subdirectory under `repos/` is named after the source repository.
 
 ## extract-ai-context.sh
 

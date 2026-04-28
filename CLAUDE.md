@@ -77,10 +77,11 @@ ai-context/  (personal private instance)
 ├── install.sh
 ├── CLAUDE.md
 ├── README.md
-└── <repo-name>/
-    ├── CLAUDE.md          # (and/or)
-    └── AGENTS.md          # (and/or)
-    └── GEMINI.md
+└── repos/
+    └── <repo-name>/
+        ├── CLAUDE.md          # (and/or)
+        └── AGENTS.md          # (and/or)
+        └── GEMINI.md
 ```
 
 ## Script Behaviour Reference

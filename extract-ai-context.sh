@@ -36,6 +36,7 @@ type pfb >/dev/null 2>&1 || {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPOS_DIR="$SCRIPT_DIR/repos"
 AI_FILES=(CLAUDE.md AGENTS.md GEMINI.md)
 PARALLEL=false
 QUIET=false
@@ -99,7 +100,7 @@ _untrack() {
 _copy_here() {
     local repo_name="$1" src_dir="$2"; shift 2
     local files=("$@")
-    local dest_dir="$SCRIPT_DIR/$repo_name"
+    local dest_dir="$REPOS_DIR/$repo_name"
     mkdir -p "$dest_dir"
     for ai_file in "${files[@]}"; do cp "$src_dir/$ai_file" "$dest_dir/$ai_file"; done
 }
@@ -112,7 +113,7 @@ _commit_here() {
     local repo_name="$1"; shift
     local files=("$@")
     local file_list="${files[*]}"
-    git -C "$SCRIPT_DIR" add "$repo_name/"
+    git -C "$SCRIPT_DIR" add "repos/$repo_name/"
     git -C "$SCRIPT_DIR" commit -m "feat($repo_name): add AI context file(s) ${file_list// /, }"
 }
 
@@ -278,7 +279,7 @@ single_mode() {
     pfb success "committed .gitignore update"
 
     pfb heading "Storing in ai-context repo" "💾"
-    local dest_dir="$SCRIPT_DIR/$repo_name"
+    local dest_dir="$REPOS_DIR/$repo_name"
     _copy_here "$repo_name" "$repo_path" "${found_files[@]}"
     for ai_file in "${found_files[@]}"; do pfb success "copied $ai_file to $dest_dir/"; done
     _commit_here "$repo_name" "${found_files[@]}"
@@ -408,7 +409,7 @@ batch_mode() {
         read -ra files <<< "$files_str"
         local repo_path="${repo_paths[$repo]}"
         for ai_file in "${files[@]}"; do
-            local target="$repo_path/$ai_file" source="$SCRIPT_DIR/$repo/$ai_file"
+            local target="$repo_path/$ai_file" source="$REPOS_DIR/$repo/$ai_file"
             if [[ -f "$target" && ! -L "$target" ]]; then
                 mv "$target" "${target}.backup.$(date '+%Y%m%d%H%M%S')"
                 pfb warn "$repo/$ai_file backed up"

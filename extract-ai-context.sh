@@ -85,7 +85,10 @@ _untrack() {
     local gitignore="$repo_path/.gitignore"
     for ai_file in "${files[@]}"; do
         git -C "$repo_path" rm --cached "$ai_file"
-        grep -qxF "$ai_file" "$gitignore" 2>/dev/null || echo "$ai_file" >> "$gitignore"
+        if ! grep -qxF "$ai_file" "$gitignore" 2>/dev/null; then
+            [[ -s "$gitignore" ]] && [[ $(tail -c1 "$gitignore" | wc -l) -eq 0 ]] && printf '\n' >> "$gitignore"
+            echo "$ai_file" >> "$gitignore"
+        fi
     done
     local file_list="${files[*]}"
     git -C "$repo_path" add .gitignore

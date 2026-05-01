@@ -70,6 +70,19 @@ EOF
     exit 0
 }
 
+# @description Ensures an ignore pattern exists in a .gitignore file.
+# @param $1 gitignore_path
+# @param $2 pattern
+# @return 0 on success
+# @example _ensure_gitignore_pattern /path/to/.gitignore CLAUDE.md.backup.*
+_ensure_gitignore_pattern() {
+    local gitignore_path="$1" pattern="$2"
+    if ! grep -qxF "$pattern" "$gitignore_path" 2>/dev/null; then
+        [[ -s "$gitignore_path" ]] && [[ $(tail -c1 "$gitignore_path" | wc -l) -eq 0 ]] && printf '\n' >> "$gitignore_path"
+        printf '%s\n' "$pattern" >> "$gitignore_path"
+    fi
+}
+
 # ---------------------------------------------------------------------------
 # Silent helper functions — no pfb, called from both modes
 # ---------------------------------------------------------------------------
@@ -85,10 +98,8 @@ _untrack() {
     local gitignore="$repo_path/.gitignore"
     for ai_file in "${files[@]}"; do
         git -C "$repo_path" rm --cached "$ai_file"
-        if ! grep -qxF "$ai_file" "$gitignore" 2>/dev/null; then
-            [[ -s "$gitignore" ]] && [[ $(tail -c1 "$gitignore" | wc -l) -eq 0 ]] && printf '\n' >> "$gitignore"
-            echo "$ai_file" >> "$gitignore"
-        fi
+        _ensure_gitignore_pattern "$gitignore" "$ai_file"
+        _ensure_gitignore_pattern "$gitignore" "$ai_file.backup.*"
     done
     local file_list="${files[*]}"
     git -C "$repo_path" add .gitignore
@@ -270,10 +281,16 @@ single_mode() {
         git -C "$repo_path" rm --cached "$ai_file"
         pfb success "removed $ai_file from git index"
         if ! grep -qxF "$ai_file" "$gitignore" 2>/dev/null; then
-            echo "$ai_file" >> "$gitignore"
+            _ensure_gitignore_pattern "$gitignore" "$ai_file"
             pfb success "added $ai_file to .gitignore"
         else
             pfb subheading "$ai_file already in .gitignore"
+        fi
+        if ! grep -qxF "$ai_file.backup.*" "$gitignore" 2>/dev/null; then
+            _ensure_gitignore_pattern "$gitignore" "$ai_file.backup.*"
+            pfb success "added $ai_file.backup.* to .gitignore"
+        else
+            pfb subheading "$ai_file.backup.* already in .gitignore"
         fi
     done
     local file_list="${found_files[*]}"
